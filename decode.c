@@ -79,6 +79,7 @@ static unsigned char cmdtable[] =
 	ESC,' ',0,			A_FF_SCREEN,
 	'F',0,				A_F_FOREVER,
 	ESC,'F',0,			A_F_UNTIL_HILITE,
+	ESC,'[','<',0,			A_SGR_MOUSE_PREFIX,
 	'R',0,				A_FREPAINT,
 	'r',0,				A_REPAINT,
 	CONTROL('R'),0,			A_REPAINT,
@@ -529,6 +530,9 @@ cmd_decode(tlist, cmd, sp)
 		if (action != A_INVALID)
 			break;
 	}
+	if (action == A_SGR_MOUSE_PREFIX) {
+		action = get_sgr_mouse_action();
+	}
 	if (action == A_UINVALID)
 		action = A_INVALID;
 	return (action);
@@ -870,3 +874,90 @@ editchar(c, flags)
 	return action;
 }
 
+/*
+ * Get sgr mouse action
+ */
+	public int
+get_sgr_mouse_action()
+{
+	int action = 0;
+	int num_params = 0;
+	int n = 0;
+	char delimiter = '?';
+	int mbutton = 0;
+	char mbutton_stat = '?';
+	/* 64;33;15M */
+	for(num_params = 1; num_params <= 3; num_params++) {
+		if (! sgr_param(&n, &delimiter)) {
+			action = A_INVALID;
+			break;
+		}
+		if (num_params == 1) {
+			mbutton = n;
+		}
+		if (num_params == 3) {
+			switch (delimiter) {
+			case 'M':
+				mbutton_stat = 'P';
+				break;
+			case 'm':
+				mbutton_stat = 'R';
+				break;
+			default:
+				action = A_INVALID;
+				break;
+			}
+		}
+	}
+	if (action == A_INVALID) {
+		return action;
+	} else {
+		if (mbutton == 64 && mbutton_stat == 'P') {
+			action = A_WHEEL_UP;
+		} else if (mbutton == 65 && mbutton_stat == 'P') {
+			action = A_WHEEL_DOWN;
+		} else {
+			action = A_INVALID;
+		}
+		return action;
+	}
+}
+
+/*
+ * Parse sgr param, returning the number parsed and the ending delimiter
+ */
+	public int
+sgr_param(n, delimiter)
+	int  *n;
+	char *delimiter;
+{
+	int c = 0;
+	char cbuf[100]; /* TODO HOW BIG? */
+	int cn = 0;
+	int action = 0;
+	int param_end = 0;
+	while (action != A_INVALID && param_end != 1) {
+		c = getcc();
+		switch (c) {
+		case 'M': case 'm': case ';':
+			*delimiter = c;
+			param_end = 1;
+			break;
+		case '0': case '1': case '2': case '3': case '4':
+		case '5': case '6': case '7': case '8': case '9':
+			cbuf[cn] = c;
+			cn++;
+			break;
+		default:
+			action = A_INVALID;
+			break;
+		}
+	}
+	if (action == A_INVALID) {
+		return 0;
+	} else {
+		cbuf[cn] = '\0';
+		*n = atoi(cbuf);
+		return 1;
+	}
+}

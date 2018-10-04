@@ -71,6 +71,9 @@
 #define A_RRSHIFT              59
 #define A_CLRMARK              62
 #define A_SETMARKBOT           63
+#define A_SGR_MOUSE_PREFIX     64
+#define A_WHEEL_UP             65
+#define A_WHEEL_DOWN           66
 
 #define A_INVALID              100
 #define A_NOACTION             101

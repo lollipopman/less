@@ -308,3 +308,5 @@ public int edit_tagfile LESSPARAMS ((VOID_PARAM));
 public void open_getchr LESSPARAMS ((VOID_PARAM));
 public void close_getchr LESSPARAMS ((VOID_PARAM));
 public int getchr LESSPARAMS ((VOID_PARAM));
+public int sgr_param LESSPARAMS ((int *n, char *delimiter));
+public int get_sgr_mouse_action LESSPARAMS ((VOID_PARAM));

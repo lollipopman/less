@@ -1260,6 +1260,16 @@ commands()
 			forward((int) number, 0, 0);
 			break;
 
+		case A_WHEEL_UP:
+			cmd_exec();
+			backward(1, 0, 0);
+			break;
+
+		case A_WHEEL_DOWN:
+			cmd_exec();
+			forward(1, 0, 0);
+			break;
+
 		case A_B_LINE:
 			/*
 			 * Backward N (default 1) line.

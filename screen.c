@@ -1585,6 +1585,9 @@ init()
 	initcolor();
 	flush();
 #endif
+	/* TODO Guard?? */
+	puts("\e[?1002h");
+	puts("\e[?1006h");
 	init_done = 1;
 }
 
@@ -1612,6 +1615,9 @@ deinit()
 	clreol();
 #endif
 #endif
+	/* TODO Guard?? */
+	puts("\e[?1006l");
+	puts("\e[?1002l");
 	init_done = 0;
 }
 
